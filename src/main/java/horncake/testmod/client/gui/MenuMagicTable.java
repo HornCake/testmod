@@ -1,31 +1,25 @@
 package horncake.testmod.client.gui;
 
 import horncake.testmod.init.RegisterBlock;
-import horncake.testmod.init.RegisterItem;
 import horncake.testmod.init.RegisterMenuType;
-import horncake.testmod.item.ItemTest;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.SoundType;
-import org.apache.commons.lang3.StringUtils;
 import org.jline.utils.Log;
 
 
 public class MenuMagicTable extends AbstractContainerMenu {
 
     private final ContainerLevelAccess access;
-    private String text;
+    private String typeData;
+    private String countData;
+    private String rangeData;
+
 
 
     public final Container inputSlot = new SimpleContainer(1) {
@@ -71,10 +65,8 @@ public class MenuMagicTable extends AbstractContainerMenu {
         for(int k = 0; k < 9; ++k) {
             this.addSlot(new Slot(inventory, k, 8 + k * 18, 142));
         }
-
-
-
     }
+
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
@@ -103,9 +95,10 @@ public class MenuMagicTable extends AbstractContainerMenu {
     }
 
 
-    public void setText(String newText) {
-        this.text = newText;
-        createResult();
+    public void setData(String type, String count, String range) {
+        this.typeData = type;
+        this.countData = count;
+        this.rangeData = range;
     }
 
     private boolean isInt(String string) {
@@ -119,15 +112,24 @@ public class MenuMagicTable extends AbstractContainerMenu {
 
 
     public void createResult() {
+        Log.info("2");
+        Log.info(this.countData);
         ItemStack stack = this.inputSlot.getItem(0);
-        if(text == null) { return; }
-        if(!stack.isEmpty() && isInt(text)) {
-            CompoundTag nbt = new CompoundTag();
-            nbt.putInt("Count",Integer.parseInt(text));
+        if(countData == null) { return; }
+        if(!stack.isEmpty() && isInt(typeData) && isInt(countData) && isInt(rangeData)) {
+            CompoundTag nbt = stack.getOrCreateTag();
+            nbt.putInt("type",Integer.parseInt(typeData));
+            nbt.putInt("Count",Integer.parseInt(countData));
+
+            nbt.putInt("Range",Integer.parseInt(rangeData));
+
             stack.setTag(nbt);
-            Log.info(text+"sa");
+            Log.info(countData +"sa");
             this.resultSlot.setItem(0,inputSlot.getItem(0));
             Log.info(this.resultSlot.getItem(0));
+        } else {
+            Log.info("4");
+
         }
         this.broadcastChanges();
     }
