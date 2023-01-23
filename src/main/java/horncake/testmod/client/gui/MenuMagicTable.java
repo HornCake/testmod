@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import org.jline.utils.Log;
 
 
@@ -20,6 +21,7 @@ public class MenuMagicTable extends AbstractContainerMenu {
     private String countData;
     private String rangeData;
 
+    public boolean isRemoved;
 
 
     public final Container inputSlot = new SimpleContainer(1) {
@@ -40,7 +42,13 @@ public class MenuMagicTable extends AbstractContainerMenu {
     public MenuMagicTable(int id, Inventory inventory, final ContainerLevelAccess access) {
         super(RegisterMenuType.MENU_MAGIC_TABLE.get(), id);
         this.access = access;
-        this.addSlot(new Slot(this.inputSlot,0,20,33));
+        this.addSlot(new Slot(this.inputSlot,0,20,33) {
+            @Override
+            public ItemStack remove(int pAmount) {
+                isRemoved = true;
+                return super.remove(pAmount);
+            }
+        });
         this.addSlot(new Slot(this.resultSlot, 0, 20, 13) {
             @Override
             public void onTake(Player pPlayer, ItemStack pStack) {
@@ -79,6 +87,7 @@ public class MenuMagicTable extends AbstractContainerMenu {
                 if (!this.moveItemStackTo(itemstack1, 2, this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
+                isRemoved = true;
             } else if (!this.moveItemStackTo(itemstack1, 0, 1, false)) {
                 return ItemStack.EMPTY;
             }
@@ -110,7 +119,6 @@ public class MenuMagicTable extends AbstractContainerMenu {
         }
     }
 
-
     public void createResult() {
         Log.info("2");
         Log.info(this.countData);
@@ -118,7 +126,7 @@ public class MenuMagicTable extends AbstractContainerMenu {
         if(countData == null) { return; }
         if(!stack.isEmpty() && isInt(typeData) && isInt(countData) && isInt(rangeData)) {
             CompoundTag nbt = stack.getOrCreateTag();
-            nbt.putInt("type",Integer.parseInt(typeData));
+            nbt.putInt("Type",Integer.parseInt(typeData));
             nbt.putInt("Count",Integer.parseInt(countData));
 
             nbt.putInt("Range",Integer.parseInt(rangeData));
@@ -134,7 +142,9 @@ public class MenuMagicTable extends AbstractContainerMenu {
         this.broadcastChanges();
     }
 
-
+    public void setSlotRemoved(Boolean bool) {
+        this.isRemoved = bool;
+    }
 
     public void removed(Player pPlayer) {
         super.removed(pPlayer);
