@@ -3,6 +3,7 @@ package horncake.testmod.client.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import horncake.testmod.TestMod;
+import horncake.testmod.client.gui.widget.DataEditBoxes;
 import horncake.testmod.init.RegisterMessage;
 import horncake.testmod.network.PacketMagicTableCreateResult;
 import horncake.testmod.network.PacketMagicTableSetText;
@@ -15,23 +16,27 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jline.utils.Log;
 
-import java.util.function.Consumer;
+import java.util.List;
 
 public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
+    private static final List<String> KEYS = List.of("Type","Count","Range");
+    private static final DataEditBoxes BOXES = new DataEditBoxes(3,KEYS);
+    /*
     private EditBox typeText;
     private EditBox countText;
     private EditBox rangeText;
 
+     */
     private Button createButton;
 
     private boolean isInitialized;
 
     public ScreenMagicTable(MenuMagicTable pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
+
     }
 
     @Override
@@ -43,9 +48,13 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
 
         // Then the widgets if this is a direct child of the Screen
         super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+        BOXES.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+        /*
         this.typeText.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
         this.countText.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
         this.rangeText.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+
+         */
         this.createButton.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
 
     }
@@ -53,9 +62,12 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
     @Override
     protected void containerTick() {
         super.containerTick();
+        /*
         this.typeText.tick();
         this.countText.tick();
         this.rangeText.tick();
+         */
+        BOXES.tick();
         if(this.menu.isRemoved == true) {
             this.resetText();
             this.menu.setSlotRemoved(false);
@@ -71,16 +83,23 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
 
         int w = (this.width - this.imageWidth) / 2;
         int h = (this.height - this.imageHeight) / 2;
+        for (int i = 0; i < KEYS.size(); i++) {
+            BOXES.setEditBox(KEYS.get(i),new EditBox(this.font, w + 62, h + 24 + (12 * i), 50, 12, Component.literal(KEYS.get(i))));
+        }
+        /*
         this.typeText = new EditBox(this.font, w + 62, h + 24, 50, 12, Component.literal("Type"));
         this.countText = new EditBox(this.font, w + 62, h + 36, 50, 12, Component.literal("Count"));
         this.rangeText = new EditBox(this.font, w + 62, h + 48, 50, 12, Component.literal("Count"));
 
-        this.typeText.setResponder(this::onTypeChanged);
-        this.countText.setResponder(this::onCountChanged);
-        this.rangeText.setResponder(this::onRangeChanged);
-        initSimpleEditBox(typeText);
-        initSimpleEditBox(countText);
-        initSimpleEditBox(rangeText);
+
+         */
+        BOXES.getBox("Type").setResponder(this::onTypeChanged);
+        BOXES.getBox("Count").setResponder(this::onCountChanged);
+        BOXES.getBox("Range").setResponder(this::onRangeChanged);
+
+        for(String string : KEYS) {
+            initSimpleEditBox(BOXES.getBox(string));
+        }
 
 
 
@@ -116,17 +135,22 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
     private void initText() {
         ItemStack stack = this.menu.inputSlot.getItem(0);
         CompoundTag tag = stack.getOrCreateTag();
+        //nbtタグとEditBoxのKEYは一致させること
+        for(String string : KEYS) {
+            BOXES.setValueFromTag(string,tag);
+        }
+        /*
         this.typeText.setValue(String.valueOf(tag.getInt("Type")));
         this.countText.setValue(String.valueOf(tag.getInt("Count")));
         this.rangeText.setValue(String.valueOf(tag.getInt("Range")));
 
+
+         */
         this.isInitialized = true;
     }
 
     private void resetText() {
-        this.typeText.setValue("");
-        this.countText.setValue("");
-        this.rangeText.setValue("");
+        BOXES.setAllValue("");
 
         this.isInitialized = false;
     }
@@ -134,22 +158,22 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
     //さすがに糞コード
     private void onTypeChanged(String string) {
         if (!string.isEmpty()) {
-            this.menu.setData(string, this.countText.getValue(), this.rangeText.getValue());
-            RegisterMessage.sendToServer(new PacketMagicTableSetText(string, this.countText.getValue(), this.rangeText.getValue()));
+            this.menu.setData(string, BOXES.getBox("Count").getValue(), BOXES.getBox("Range").getValue());
+            RegisterMessage.sendToServer(new PacketMagicTableSetText(string, BOXES.getBox("Count").getValue(), BOXES.getBox("Range").getValue()));
         }
     }
 
     private void onCountChanged(String string) {
         if (!string.isEmpty()) {
-            this.menu.setData(this.typeText.getValue(), string, this.rangeText.getValue());
-            RegisterMessage.sendToServer(new PacketMagicTableSetText(this.typeText.getValue(), string, this.rangeText.getValue()));
+            this.menu.setData(BOXES.getBox("Type").getValue(), string, BOXES.getBox("Range").getValue());
+            RegisterMessage.sendToServer(new PacketMagicTableSetText(BOXES.getBox("Type").getValue(), string, BOXES.getBox("Range").getValue()));
         }
     }
 
     private void onRangeChanged(String string) {
         if (!string.isEmpty()) {
-            this.menu.setData(this.typeText.getValue(), this.countText.getValue(), string);
-            RegisterMessage.sendToServer(new PacketMagicTableSetText(this.typeText.getValue(), this.countText.getValue(), string));
+            this.menu.setData(BOXES.getBox("Type").getValue(), BOXES.getBox("Count").getValue(), string);
+            RegisterMessage.sendToServer(new PacketMagicTableSetText(BOXES.getBox("Type").getValue(), BOXES.getBox("Count").getValue(), string));
         }
     }
 

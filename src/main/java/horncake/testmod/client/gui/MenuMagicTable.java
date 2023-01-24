@@ -33,6 +33,7 @@ public class MenuMagicTable extends AbstractContainerMenu {
     };
 
 
+
     public final Container resultSlot = new ResultContainer();
 
     public MenuMagicTable(int id, Inventory inventory) {
