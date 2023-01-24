@@ -24,7 +24,7 @@ public class RegisterParticle {
     @SubscribeEvent
     public static void registerParticle(RegisterParticleProvidersEvent event) {
         Minecraft.getInstance().particleEngine.register(TEST_PARTICLE.get(), ParticleTestFactory::new);
-        Minecraft.getInstance().particleEngine.register(PLANE_TEST_PARTICLE.get(), new ParticlePlaneTest.Provider());
+        Minecraft.getInstance().particleEngine.register(PLANE_TEST_PARTICLE.get(), ParticlePlaneTest.Provider::new);
 
     }
 }
