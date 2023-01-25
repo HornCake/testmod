@@ -28,11 +28,13 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
     private EditBox typeText;
     private EditBox countText;
     private EditBox rangeText;
-
      */
     private Button createButton;
-
     private boolean isInitialized;
+
+    private final int BOX_X_OFFSET = 62;
+    private final int BOX_Y_OFFSET = 24;
+    private final int BOX_GAP = 12;
 
     public ScreenMagicTable(MenuMagicTable pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
@@ -41,14 +43,25 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
 
     @Override
     public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
+        int initX = (this.width - this.imageWidth) / 2;
+        int initY = (this.height - this.imageHeight) / 2;
         // Background is typically rendered first
         this.renderBackground(pPoseStack);
 
         // Render things here before widgets (background textures)
 
         // Then the widgets if this is a direct child of the Screen
+
         super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
-        BOXES.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+        for(int i = 0; i < KEYS.size(); i++) {
+            String key = KEYS.get(i);
+            if(BOXES.getBox(key).isFocused()) {
+                BOXES.render(key, pPoseStack, pMouseX, pMouseY, pPartialTick);
+            } else {
+                drawString(pPoseStack, this.font, BOXES.getValue(key), initX + BOX_X_OFFSET, initY + BOX_Y_OFFSET + BOX_GAP * i, -1);
+            }
+        }
+
         /*
         this.typeText.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
         this.countText.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
@@ -71,20 +84,29 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
         if(this.menu.isRemoved == true) {
             this.resetText();
             this.menu.setSlotRemoved(false);
-            Log.info("aaa");
+            //Log.info("aaa");
         } else if(this.menu.slots.get(0).hasItem() && !isInitialized) {
             this.initText();
         }
+        //Log.info(BOXES.getBox("Type").isActive()+ "\n" + BOXES.getBox("Count").isActive() +"\n"+ BOXES.getBox("Range").isActive());
     }
 
     @Override
     protected void init() {
         super.init();
+        int initX = (this.width - this.imageWidth) / 2;
+        int initY = (this.height - this.imageHeight) / 2;
 
-        int w = (this.width - this.imageWidth) / 2;
-        int h = (this.height - this.imageHeight) / 2;
         for (int i = 0; i < KEYS.size(); i++) {
-            BOXES.setEditBox(KEYS.get(i),new EditBox(this.font, w + 62, h + 24 + (12 * i), 50, 12, Component.literal(KEYS.get(i))));
+            BOXES.setEditBox(KEYS.get(i),new EditBox(this.font, initX + BOX_X_OFFSET, initY + BOX_Y_OFFSET + (BOX_GAP * i), 50, 12, Component.literal(KEYS.get(i))) {
+                @Override
+                public void onRelease(double pMouseX, double pMouseY) {
+                    Log.info("hi");
+                    resetFocus();
+                    setFocus(true);
+                    super.onRelease(pMouseX, pMouseY);
+                }
+            });
         }
         /*
         this.typeText = new EditBox(this.font, w + 62, h + 24, 50, 12, Component.literal("Type"));
@@ -97,9 +119,7 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
         BOXES.getBox("Count").setResponder(this::onCountChanged);
         BOXES.getBox("Range").setResponder(this::onRangeChanged);
 
-        for(String string : KEYS) {
-            initSimpleEditBox(BOXES.getBox(string));
-        }
+        KEYS.forEach(key -> initSimpleEditBox(BOXES.getBox(key)));
 
 
 
@@ -110,14 +130,16 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
     }
 
     private void initSimpleEditBox(EditBox text) {
-        text.setCanLoseFocus(false);
+        text.setCanLoseFocus(true);
         text.setTextColor(-1);
-        text.setTextColorUneditable(-1);
         text.setBordered(false);
-        this.setInitialFocus(text);
         text.setValue("");
         text.setEditable(true);
         this.addWidget(text);
+    }
+
+    private void resetFocus() {
+        KEYS.forEach(key -> BOXES.getBox(key).setFocus(false));
     }
 
 
@@ -136,9 +158,7 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
         ItemStack stack = this.menu.inputSlot.getItem(0);
         CompoundTag tag = stack.getOrCreateTag();
         //nbtタグとEditBoxのKEYは一致させること
-        for(String string : KEYS) {
-            BOXES.setValueFromTag(string,tag);
-        }
+        KEYS.forEach(key -> BOXES.setValueFromTag(key,tag));
         /*
         this.typeText.setValue(String.valueOf(tag.getInt("Type")));
         this.countText.setValue(String.valueOf(tag.getInt("Count")));

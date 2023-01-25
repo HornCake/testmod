@@ -56,15 +56,16 @@ public class ParticlePlaneTest extends TextureSheetParticle {
 
         int light = LightTexture.FULL_SKY;
 
-        for(int i = 0; i < 4 ;i++) {
-            Vec3 v = PLANE[i].add(f,f1,f2);
-            pBuffer.vertex(v.x,v.y,v.z)
-                    .uv(Math.abs(i -2)  < 1 ? u0 : u1, (float)i / 2 == 0 ? v1 : v0)
-                    .color(rCol,gCol,bCol,alpha)
-                    .uv2(light)
-                    .endVertex();
+        for(int i = 0; i < 2; i++) {
+            for (int j = 0; j < 4; j++) {
+                Vec3 v = PLANE[j].multiply(2 * i - 1,1,1).add(f, f1, f2);
+                pBuffer.vertex(v.x, v.y, v.z)
+                        .uv(Math.abs(j - 2) < 1 ? u0 : u1, (float) j / 2 == 0 ? v1 : v0)
+                        .color(rCol, gCol, bCol, alpha)
+                        .uv2(light)
+                        .endVertex();
+            }
         }
-
         /*
         Quaternion quaternion;
         if (this.roll == 0.0F) {
