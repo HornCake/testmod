@@ -1,5 +1,6 @@
 package horncake.testmod.item;
 
+import horncake.testmod.util.LocalVec;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -31,6 +32,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jline.utils.Log;
 
 import java.awt.geom.Arc2D;
 
@@ -91,12 +93,23 @@ public class ItemTest extends Item {
 
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int p_41407_, boolean p_41408_) {
-        if (entity.getType() == EntityType.PLAYER && level.isClientSide) {
-            Player player = (Player) entity;
-            if(player.isHolding(this)) {
-                BlockHitResult hit = rayTrace(level,(Player)entity, ClipContext.Fluid.NONE);
-                BlockPos pos = hit.getBlockPos();
-                showBoxParticle(level,pos);
+        if(level.isClientSide) {
+            if (entity.getType() == EntityType.PLAYER && level.isClientSide) {
+                Player player = (Player) entity;
+                if(player.isHolding(this)) {
+                    BlockHitResult hit = rayTrace(level,(Player)entity, ClipContext.Fluid.NONE);
+                    BlockPos pos = hit.getBlockPos();
+                    showBoxParticle(level,pos);
+
+                    Vec3 vec;
+                    LocalVec localVec = new LocalVec(player.getLookAngle());
+                    vec = localVec.add(1,0,0).getVec3().add(player.getEyePosition());
+                    level.addParticle(ParticleTypes.CRIT,vec.x,vec.y,vec.z,0,0,0);
+                    vec = localVec.add(0,1,0).getVec3().add(player.getEyePosition());
+                    level.addParticle(ParticleTypes.ENCHANTED_HIT,vec.x,vec.y,vec.z,0,0,0);
+                    vec = localVec.add(0,0,1).getVec3().add(player.getEyePosition());
+                    level.addParticle(ParticleTypes.WITCH,vec.x,vec.y,vec.z,0,0,0);
+                }
             }
         }
         super.inventoryTick(stack, level, entity, p_41407_, p_41408_);

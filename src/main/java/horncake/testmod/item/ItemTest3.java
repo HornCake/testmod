@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -65,6 +66,17 @@ public class ItemTest3 extends Item {
             int type = stack.getTag().getInt("Type");
             int range = stack.getTag().getInt("Range");
             int count = stack.getTag().getInt("Count");
+            /*
+            CompoundTag tag = new CompoundTag();
+            tag.putInt("A",1);
+            tag.putInt("B",-1);
+            ListTag listtag = new ListTag();
+            listtag.add(tag);
+            listtag.add(tag);
+            CompoundTag nbt = stack.getOrCreateTag();
+            nbt.put("Test",listtag);
+            stack.setTag(nbt);
+            */
 
             if (!level.isClientSide) {
                 shootProjectiles(level, player,type,range,count);
