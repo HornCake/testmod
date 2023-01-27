@@ -30,6 +30,7 @@ public class TestMod {
         RegisterEntity.ENTITY_TYPES.register(bus);
         RegisterParticle.PARTICLES.register(bus);
         RegisterMenuType.MENUS.register(bus);
+        RegisterBlockEntity.BLOCK_ENTITIES.register(bus);
 
 
         MinecraftForge.EVENT_BUS.register(this);
