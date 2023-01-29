@@ -8,6 +8,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -15,6 +16,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.jline.utils.Log;
 
@@ -30,13 +34,13 @@ public class BlockTestPedestal extends Block implements EntityBlock {
                 ItemEntity entity = new ItemEntity(pLevel, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), tile.getItem());
                 pLevel.addFreshEntity(entity);
                 tile.setItem(ItemStack.EMPTY);
-                Log.info("waa");
             }
             if(!pPlayer.getItemInHand(pHand).isEmpty()) {
                 tile.setItem(pPlayer.getInventory().removeItem(pPlayer.getInventory().selected, 1));
-                Log.info("hhaa");
             }
             pLevel.sendBlockUpdated(pPos,pState,pState, 2);
+            Log.info(tile.getItem());
+
         }
         return InteractionResult.SUCCESS;
     }
@@ -46,5 +50,11 @@ public class BlockTestPedestal extends Block implements EntityBlock {
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
         return RegisterBlockEntity.TILE_TEST_PEDESTAL.get().create(pPos,pState);
+    }
+
+    @Override
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        VoxelShape shape = Shapes.box(0.0625, 0, 0.0625, 0.9375, 0.75, 0.9375);
+        return shape;
     }
 }

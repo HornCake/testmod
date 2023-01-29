@@ -3,5 +3,6 @@
   "item.testmod.item_test2": "TestI2",
   "item.testmod.item_test3": "TestI3",
   "block.testmod.block_test": "TestB",
-  "block.testmod.magic_table": "MagicTable"
+  "block.testmod.magic_table": "MagicTable",
+  "block.testmod.test_pedestal": "TestPedestal"
 }

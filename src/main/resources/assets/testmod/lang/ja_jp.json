@@ -3,5 +3,6 @@
   "item.testmod.item_test2": "テストI2",
   "item.testmod.item_test3": "テストI3",
   "block.testmod.block_test": "テストB",
-  "block.testmod.magic_table": "マジックテーブル"
+  "block.testmod.magic_table": "マジックテーブル",
+  "block.testmod.test_pedestal": "台座"
 }

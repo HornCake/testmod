@@ -25,4 +25,7 @@ public class RegisterItem {
             () -> new BlockItem(RegisterBlock.BLOCK_TEST.get(),new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
     public static final  RegistryObject<Item> BLOCK_MAGIC_TABLE = ITEMS.register("magic_table",
             () -> new BlockItem(RegisterBlock.MAGIC_TABLE.get(),new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
+    public static final  RegistryObject<Item> BLOCK_TEST_PEDESTAL = ITEMS.register("test_pedestal",
+            () -> new BlockItem(RegisterBlock.TEST_PEDESTAL.get(),new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
+
 }
