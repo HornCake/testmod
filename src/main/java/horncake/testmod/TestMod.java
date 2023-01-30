@@ -3,6 +3,7 @@ package horncake.testmod;
 import com.mojang.logging.LogUtils;
 import horncake.testmod.init.*;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.client.model.obj.ObjLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -40,5 +41,6 @@ public class TestMod {
         // Some common setup code
         LOGGER.info("HELLO FROM COMMON SETUP");
         LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
+
     }
 }

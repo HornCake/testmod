@@ -1,7 +1,9 @@
 package horncake.testmod.client.gui;
 
+import horncake.testmod.block.tile.TileMagicTable;
 import horncake.testmod.init.RegisterBlock;
 import horncake.testmod.init.RegisterMenuType;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.Container;
@@ -10,6 +12,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jline.utils.Log;
 
 
@@ -19,6 +22,8 @@ public class MenuMagicTable extends AbstractContainerMenu {
     private String typeData;
     private String countData;
     private String rangeData;
+
+    private Container container;
 
     public boolean isRemoved;
 
@@ -31,17 +36,22 @@ public class MenuMagicTable extends AbstractContainerMenu {
         }
     };
 
-
-
     public final Container resultSlot = new ResultContainer();
 
     public MenuMagicTable(int id, Inventory inventory) {
-        this(id,inventory,ContainerLevelAccess.NULL);
+        this(id,inventory,ContainerLevelAccess.NULL, new SimpleContainer(1));
     }
 
-    public MenuMagicTable(int id, Inventory inventory, final ContainerLevelAccess access) {
+    public MenuMagicTable(int id, Inventory inventory, Container container) {
+        this(id,inventory,ContainerLevelAccess.NULL, container);
+    }
+
+    public MenuMagicTable(int id, Inventory inventory, final ContainerLevelAccess access, Container container) {
         super(RegisterMenuType.MENU_MAGIC_TABLE.get(), id);
         this.access = access;
+        if(this.container == null) {
+            this.container = container;
+        }
         this.addSlot(new Slot(this.inputSlot,0,20,33) {
             @Override
             public ItemStack remove(int pAmount) {
@@ -49,6 +59,7 @@ public class MenuMagicTable extends AbstractContainerMenu {
                 return super.remove(pAmount);
             }
         });
+
         this.addSlot(new Slot(this.resultSlot, 0, 20, 13) {
             @Override
             public void onTake(Player pPlayer, ItemStack pStack) {
@@ -58,7 +69,6 @@ public class MenuMagicTable extends AbstractContainerMenu {
                 setChanged();
                 broadcastChanges();
             }
-
             @Override
             public boolean mayPlace(ItemStack pStack) {
                 return false;
@@ -72,6 +82,10 @@ public class MenuMagicTable extends AbstractContainerMenu {
         }
         for(int k = 0; k < 9; ++k) {
             this.addSlot(new Slot(inventory, k, 8 + k * 18, 142));
+        }
+
+        if(container != null && container instanceof TileMagicTable tile) {
+            this.inputSlot.setItem(0, tile.getItem());
         }
     }
 
@@ -100,7 +114,6 @@ public class MenuMagicTable extends AbstractContainerMenu {
         }
         this.broadcastChanges();
         return itemstack;
-
     }
 
 
@@ -132,12 +145,7 @@ public class MenuMagicTable extends AbstractContainerMenu {
             nbt.putInt("Range",Integer.parseInt(rangeData));
 
             stack.setTag(nbt);
-            Log.info(countData +"sa");
             this.resultSlot.setItem(0,inputSlot.getItem(0));
-            Log.info(this.resultSlot.getItem(0));
-        } else {
-            Log.info("4");
-
         }
         this.broadcastChanges();
     }
@@ -146,10 +154,14 @@ public class MenuMagicTable extends AbstractContainerMenu {
         this.isRemoved = bool;
     }
 
+
     public void removed(Player pPlayer) {
         super.removed(pPlayer);
-        this.access.execute((p_39796_, p_39797_) -> this.clearContainer(pPlayer, this.inputSlot));
+        //BlockEntity出ない場合メニューを閉じた際にプレイヤーにアイテムを渡す用?
+        //this.access.execute((p_39796_, p_39797_) -> this.clearContainer(pPlayer, this.inputSlot));
+        this.container.stopOpen(pPlayer);
     }
+
 
     @Override
     public boolean stillValid(Player pPlayer) {

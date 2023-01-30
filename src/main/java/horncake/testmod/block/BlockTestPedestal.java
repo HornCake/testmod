@@ -9,6 +9,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -39,12 +40,21 @@ public class BlockTestPedestal extends Block implements EntityBlock {
                 tile.setItem(pPlayer.getInventory().removeItem(pPlayer.getInventory().selected, 1));
             }
             pLevel.sendBlockUpdated(pPos,pState,pState, 2);
-            Log.info(tile.getItem());
-
         }
         return InteractionResult.SUCCESS;
     }
 
+    @Override
+    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+        if(!pLevel.isClientSide && pLevel.getBlockEntity(pPos) instanceof TileTestPedestal tile) {
+            if(!tile.isEmpty()) {
+                ItemEntity entity = new ItemEntity(pLevel, pPos.getX(), pPos.getY(), pPos.getZ(), tile.getItem());
+                pLevel.addFreshEntity(entity);
+            }
+
+        }
+        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
+    }
 
     @Nullable
     @Override
@@ -54,7 +64,7 @@ public class BlockTestPedestal extends Block implements EntityBlock {
 
     @Override
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        VoxelShape shape = Shapes.box(0.0625, 0, 0.0625, 0.9375, 0.75, 0.9375);
+        VoxelShape shape = Shapes.box(0.0625, 0, 0.0625, 0.9375, 0.875, 0.9375);
         return shape;
     }
 }

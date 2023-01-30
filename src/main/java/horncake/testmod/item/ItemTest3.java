@@ -1,10 +1,12 @@
 package horncake.testmod.item;
 
+import horncake.testmod.block.tile.TileTestPedestal;
 import horncake.testmod.entity.ProjectileBound;
 import horncake.testmod.entity.ProjectileStraight;
 import horncake.testmod.entity.ProjectileTest;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -27,9 +29,12 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.StoneButtonBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.jline.utils.Log;
 
 import java.util.List;
 
@@ -57,15 +62,24 @@ public class ItemTest3 extends Item {
         }
     }
 
+    @Override
+    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+        super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+        if(pStack.getTag() != null) {
+            pTooltipComponents.add(Component.literal("Type : " + pStack.getTag().getInt("Type")));
+            pTooltipComponents.add(Component.literal("Count : " + pStack.getTag().getInt("Count")));
+            pTooltipComponents.add(Component.literal("Range : " + pStack.getTag().getInt("Range")));
+        }
+    }
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (!Screen.hasShiftDown()) {
             player.getCooldowns().addCooldown(this, 5);
             ItemStack stack = player.getItemInHand(hand);
-            int type = stack.getTag().getInt("Type");
-            int range = stack.getTag().getInt("Range");
-            int count = stack.getTag().getInt("Count");
+            int type = stack.getTag() != null && stack.getTag().contains("Type") ? stack.getTag().getInt("Type") : 0;
+            int range = stack.getTag() != null && stack.getTag().contains("Range") ? stack.getTag().getInt("Range") : 0;
+            int count = stack.getTag() != null && stack.getTag().contains("Count") ? stack.getTag().getInt("Count") : 0;
             /*
             CompoundTag tag = new CompoundTag();
             tag.putInt("A",1);
@@ -78,6 +92,10 @@ public class ItemTest3 extends Item {
             stack.setTag(nbt);
             */
 
+            BlockEntity entity = level.getBlockEntity(new BlockPos(player.position()));
+            if(entity instanceof TileTestPedestal tile && level.isClientSide) {
+                Log.info(tile.getItem());
+            }
             if (!level.isClientSide) {
                 shootProjectiles(level, player,type,range,count);
                 //player.sendSystemMessage(Component.literal("Shoot!"));

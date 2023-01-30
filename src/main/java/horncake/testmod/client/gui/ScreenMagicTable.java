@@ -61,7 +61,7 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
                 drawString(pPoseStack, this.font, BOXES.getValue(key), initX + BOX_X_OFFSET, initY + BOX_Y_OFFSET + BOX_GAP * i, -1);
             }
         }
-
+        this.renderTooltip(pPoseStack, pMouseX, pMouseY);
         /*
         this.typeText.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
         this.countText.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
@@ -112,8 +112,6 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
         this.typeText = new EditBox(this.font, w + 62, h + 24, 50, 12, Component.literal("Type"));
         this.countText = new EditBox(this.font, w + 62, h + 36, 50, 12, Component.literal("Count"));
         this.rangeText = new EditBox(this.font, w + 62, h + 48, 50, 12, Component.literal("Count"));
-
-
          */
         BOXES.getBox("Type").setResponder(this::onTypeChanged);
         BOXES.getBox("Count").setResponder(this::onCountChanged);
@@ -163,8 +161,6 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
         this.typeText.setValue(String.valueOf(tag.getInt("Type")));
         this.countText.setValue(String.valueOf(tag.getInt("Count")));
         this.rangeText.setValue(String.valueOf(tag.getInt("Range")));
-
-
          */
         this.isInitialized = true;
     }

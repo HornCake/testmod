@@ -1,6 +1,7 @@
 package horncake.testmod.init;
 
 import horncake.testmod.TestMod;
+import horncake.testmod.network.PacketMagicTableCloseMenu;
 import horncake.testmod.network.PacketMagicTableCreateResult;
 import horncake.testmod.network.PacketMagicTableSetText;
 import net.minecraft.resources.ResourceLocation;
@@ -41,6 +42,12 @@ public class RegisterMessage {
                 .encoder(PacketMagicTableSetText::write)
                 .consumerMainThread(PacketMagicTableSetText::handle)
                 .add();
+        INSTANCE.messageBuilder(PacketMagicTableCloseMenu.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(PacketMagicTableCloseMenu::new)
+                .encoder(PacketMagicTableCloseMenu::write)
+                .consumerMainThread(PacketMagicTableCloseMenu::handle)
+                .add();
+
     }
 
     public static <MSG> void sendToServer(MSG message) {

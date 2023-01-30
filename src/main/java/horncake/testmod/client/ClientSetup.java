@@ -3,6 +3,7 @@ package horncake.testmod.client;
 import horncake.testmod.TestMod;
 import horncake.testmod.client.gui.ScreenMagicTable;
 import horncake.testmod.client.renderer.ProjectileTestRenderer;
+import horncake.testmod.client.renderer.tile.MagicTableRenderer;
 import horncake.testmod.client.renderer.tile.TestPedestalRenderer;
 import horncake.testmod.init.RegisterBlockEntity;
 import horncake.testmod.init.RegisterEntity;
@@ -28,6 +29,7 @@ public class ClientSetup {
         RegisterMessage.register();
 
         BlockEntityRenderers.register(RegisterBlockEntity.TILE_TEST_PEDESTAL.get(), TestPedestalRenderer::new);
+        BlockEntityRenderers.register(RegisterBlockEntity.TILE_MAGIC_TABLE.get(), MagicTableRenderer::new);
 
         event.enqueueWork(() -> MenuScreens.register(RegisterMenuType.MENU_MAGIC_TABLE.get(), ScreenMagicTable::new));
     }

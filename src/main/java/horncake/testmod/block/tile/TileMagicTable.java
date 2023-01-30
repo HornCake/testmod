@@ -1,32 +1,58 @@
 package horncake.testmod.block.tile;
 
-import horncake.testmod.init.RegisterBlock;
+import horncake.testmod.client.gui.MenuMagicTable;
 import horncake.testmod.init.RegisterBlockEntity;
+import horncake.testmod.init.RegisterMessage;
+import horncake.testmod.network.PacketMagicTableCloseMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
-import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import org.jline.utils.Log;
 
-public class TileTestPedestal extends BlockEntity implements Container {
+public class TileMagicTable extends BaseContainerBlockEntity implements Container, MenuProvider {
     protected ItemStack itemStack = ItemStack.EMPTY;
-    public ItemEntity itemEntity;
-    public float frame;
 
-    public TileTestPedestal(BlockPos pPos, BlockState pBlockState) {
-        super(RegisterBlockEntity.TILE_TEST_PEDESTAL.get(), pPos, pBlockState);
+    public TileMagicTable(BlockPos pPos, BlockState pBlockState) {
+        super(RegisterBlockEntity.TILE_MAGIC_TABLE.get(), pPos, pBlockState);
     }
 
+    @Override
+    public void stopOpen(Player pPlayer) {
+        setItem(pPlayer.containerMenu.slots.get(0).getItem());
+        Log.info(pPlayer.containerMenu.slots.get(0).getItem());
+        BlockState state = getBlockState();
+        level.sendBlockUpdated(worldPosition,state,state,2);
+        RegisterMessage.sendToPlayer(new PacketMagicTableCloseMenu(pPlayer.containerMenu.slots.get(0).getItem(), this), (ServerPlayer) pPlayer);
+        super.stopOpen(pPlayer);
+    }
+
+    @Override
+    protected Component getDefaultName() {
+        return Component.literal("TEST");
+    }
+
+    @Override
+    protected AbstractContainerMenu createMenu(int pContainerId, Inventory pInventory) {
+        return new MenuMagicTable(pContainerId, pInventory, this);
+    }
+    
     @Override
     public int getContainerSize() {
         return 1;
@@ -107,7 +133,7 @@ public class TileTestPedestal extends BlockEntity implements Container {
         super.load(pTag);
 
         //if (pTag.contains("Item",10)) {
-            this.setItem(ItemStack.of(pTag.getCompound("Item")));
+        this.setItem(ItemStack.of(pTag.getCompound("Item")));
         //}
     }
 
