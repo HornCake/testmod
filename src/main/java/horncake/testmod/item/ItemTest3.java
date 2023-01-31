@@ -45,24 +45,6 @@ public class ItemTest3 extends Item {
     }
 
     @Override
-    public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int tick) {
-        tick = 72000 - tick;
-        entity.sendSystemMessage(Component.literal(String.valueOf(tick)));
-        if(!Screen.hasShiftDown()) {
-            super.releaseUsing(stack, level, entity, tick);
-        }
-    }
-
-    @Override
-    public void onUsingTick(ItemStack stack, LivingEntity entity, int count) {
-        entity.sendSystemMessage(Component.literal("using"+(72000-count)));
-
-        if(!Screen.hasShiftDown()) {
-            super.onUsingTick(stack, entity, count);
-        }
-    }
-
-    @Override
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
         super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
         if(pStack.getTag() != null) {
