@@ -12,7 +12,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jline.utils.Log;
 
 
@@ -66,6 +65,7 @@ public class MenuMagicTable extends AbstractContainerMenu {
                 pPlayer.playSound(SoundEvents.GLASS_BREAK,1, 1);
                 inputSlot.setItem(0,ItemStack.EMPTY);
                 super.onTake(pPlayer, pStack);
+                isRemoved = true;
                 setChanged();
                 broadcastChanges();
             }
@@ -92,16 +92,18 @@ public class MenuMagicTable extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
+        //index:クリックしたアイテムのスロットのインデックス
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
         if (slot != null && slot.hasItem()) {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
             if (index < 2) {
-                if (!this.moveItemStackTo(itemstack1, 2, this.slots.size(), true)) {
+                if (!this.moveItemStackTo(itemstack1, 2, this.slots.size(), false)) {
                     return ItemStack.EMPTY;
                 }
                 isRemoved = true;
+                if(index == 1) slot.onTake(player,itemstack);
             } else if (!this.moveItemStackTo(itemstack1, 0, 1, false)) {
                 return ItemStack.EMPTY;
             }
@@ -110,6 +112,7 @@ public class MenuMagicTable extends AbstractContainerMenu {
                 slot.set(ItemStack.EMPTY);
             } else {
                 slot.setChanged();
+
             }
         }
         this.broadcastChanges();

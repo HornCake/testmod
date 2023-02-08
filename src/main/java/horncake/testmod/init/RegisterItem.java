@@ -1,7 +1,7 @@
 package horncake.testmod.init;
 
 import horncake.testmod.TestMod;
-import horncake.testmod.item.ItemTablet;
+import horncake.testmod.item.ItemCasterBoard;
 import horncake.testmod.item.ItemTest;
 import horncake.testmod.item.ItemTest2;
 import horncake.testmod.item.ItemTest3;
@@ -21,8 +21,8 @@ public class RegisterItem {
             () -> new ItemTest2(new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
     public static final RegistryObject<Item> ITEM_TEST3 = ITEMS.register("item_test3",
             () -> new ItemTest3(new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
-    public static final RegistryObject<Item> ITEM_TABLET = ITEMS.register("tablet",
-            () -> new ItemTablet(new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
+    public static final RegistryObject<Item> ITEM_CASTER_BOARD = ITEMS.register("caster_board",
+            () -> new ItemCasterBoard(new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
 
     public static final  RegistryObject<Item> BLOCK_TEST = ITEMS.register("block_test",
             () -> new BlockItem(RegisterBlock.BLOCK_TEST.get(),new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
@@ -30,5 +30,7 @@ public class RegisterItem {
             () -> new BlockItem(RegisterBlock.MAGIC_TABLE.get(),new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
     public static final  RegistryObject<Item> BLOCK_TEST_PEDESTAL = ITEMS.register("test_pedestal",
             () -> new BlockItem(RegisterBlock.TEST_PEDESTAL.get(),new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
+    public static final  RegistryObject<Item> BLOCK_BOARD_WORKBENCH = ITEMS.register("board_workbench",
+            () -> new BlockItem(RegisterBlock.BOARD_WORKBENCH.get(),new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
 
 }

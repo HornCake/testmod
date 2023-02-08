@@ -3,8 +3,11 @@ package horncake.testmod.client.particle;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
+import horncake.testmod.util.LocalVec;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
@@ -14,6 +17,7 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.jline.utils.Log;
 
 import java.util.Random;
 
@@ -24,17 +28,22 @@ public class ParticlePlaneTest extends TextureSheetParticle {
     private float initAlpha = 1.0f;
     private float endSize = 3.0f;
     private float rot;
+    private Vec3 direction;
+
     public ParticlePlaneTest(ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, SpriteSet sprite) {
         super(pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed);
         this.friction = 0.9f;
-        this.xd = pXSpeed;
-        this.yd = pYSpeed;
-        this.zd = pZSpeed;
+        this.xd = 0;
+        this.yd = 0;
+        this.zd = 0;
+        this.direction = new Vec3(pXSpeed,pYSpeed,pZSpeed);
         this.pickSprite(sprite);
         this.alpha = initAlpha;
-        this.lifetime = 20;
+        this.lifetime = 10;
         this.quadSize = 0.0f;
+        this.endSize = (float) this.direction.length();
         this.rot = new Random().nextFloat(360);
+
 
         this.setColor(1.0f,1.0f,1.0f);
 
@@ -45,15 +54,21 @@ public class ParticlePlaneTest extends TextureSheetParticle {
         super.tick();
         this.alpha = initAlpha * (1f - ((float)age / (float)lifetime));
         this.quadSize = endSize * ((float)age / (float)lifetime);
+        //Log.info(this.xd + "," + this.yd + "," + this.zd);
     }
 
     @Override
     public void render(VertexConsumer pBuffer, Camera pRenderInfo, float pPartialTicks) {
 
         Vec3 vec3 = pRenderInfo.getPosition();
+        /*
         float f = (float)(Mth.lerp(pPartialTicks, this.xo, this.x) - vec3.x());
         float f1 = (float)(Mth.lerp(pPartialTicks, this.yo, this.y) - vec3.y());
         float f2 = (float)(Mth.lerp(pPartialTicks, this.zo, this.z) - vec3.z());
+         */
+        float f = (float) (this.xo - vec3.x());
+        float f1 = (float) (this.yo - vec3.y());
+        float f2 = (float) (this.zo - vec3.z());
 
         float u0 = this.getU0();
         float u1 = this.getU1();
@@ -63,13 +78,14 @@ public class ParticlePlaneTest extends TextureSheetParticle {
         int light = LightTexture.FULL_SKY;
 
         Quaternion quaternion = new Quaternion(new Vector3f(0,0,1),rot,true);
+        Vec3 direction = this.direction.length() == 0 ? new Vec3(1, 0, 0) : this.direction;
 
         for(int i = 0; i < 2; i++) {
             for (int j = 0; j < 4; j++) {
                 Vec3 v = PLANE[j].scale(quadSize / 2).multiply(2 * i - 1,1f,1f);
                 Vector3f vf = new Vector3f(v);
                 vf.transform(quaternion);
-                v = new Vec3(vf).add(f, f1, f2);
+                v = new LocalVec(direction,new Vec3(vf)).getVec3().add(f, f1, f2);
                 //PLANE[j] = PLANE[j].add(f,f1,f2);
                 pBuffer.vertex(v.x, v.y, v.z)
                         .uv(j < 2 ? u1 : u0, Math.abs((double) j - 1.5) == 0.5 ? v0 : v1)

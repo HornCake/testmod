@@ -7,13 +7,13 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Vector3f;
+import com.mojang.serialization.Codec;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.particle.*;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.core.particles.ParticleType;
 
 public class ParticleTest extends TextureSheetParticle {
     private float initSize = 0.4f;
@@ -78,4 +78,24 @@ public class ParticleTest extends TextureSheetParticle {
         }
 
     };
+
+    public static class Provider implements ParticleProvider<ParticleTestOptions> {
+        private final SpriteSet spriteSet;
+
+        public Provider(SpriteSet spriteSet) {this.spriteSet = spriteSet;}
+
+        @Override
+        public Particle createParticle(ParticleTestOptions type, ClientLevel level, double x, double y, double z, double xd, double yd, double zd) {
+            return new ParticleTest(level, x, y, z, this.spriteSet, xd, yd, zd, new Vector3f(type.r,type.g,type.b), type.size, type.age, type.alpha);
+        }
+    }
+    public static class Type extends ParticleType<ParticleTestOptions> {
+        public Type() {
+            super(false, ParticleTestOptions.DESERIALIZER);
+        }
+        @Override
+        public Codec<ParticleTestOptions> codec() {
+            return ParticleTestOptions.CODEC;
+        }
+    }
 }

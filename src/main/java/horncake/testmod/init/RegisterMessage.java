@@ -1,9 +1,7 @@
 package horncake.testmod.init;
 
 import horncake.testmod.TestMod;
-import horncake.testmod.network.PacketMagicTableCloseMenu;
-import horncake.testmod.network.PacketMagicTableCreateResult;
-import horncake.testmod.network.PacketMagicTableSetText;
+import horncake.testmod.network.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -46,6 +44,16 @@ public class RegisterMessage {
                 .decoder(PacketMagicTableCloseMenu::new)
                 .encoder(PacketMagicTableCloseMenu::write)
                 .consumerMainThread(PacketMagicTableCloseMenu::handle)
+                .add();
+        INSTANCE.messageBuilder(PacketOpenBoardMenu.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(PacketOpenBoardMenu::new)
+                .encoder(PacketOpenBoardMenu::write)
+                .consumerMainThread(PacketOpenBoardMenu::handle)
+                .add();
+        INSTANCE.messageBuilder(PacketSetBoardSlot.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(PacketSetBoardSlot::new)
+                .encoder(PacketSetBoardSlot::write)
+                .consumerMainThread(PacketSetBoardSlot::handle)
                 .add();
 
     }

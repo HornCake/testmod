@@ -2,11 +2,12 @@
   "item.testmod.item_test": "テストI",
   "item.testmod.item_test2": "テストI2",
   "item.testmod.item_test3": "テストI3",
-  "item.testmod.tablet": "魔術版",
+  "item.testmod.caster_board": "魔術盤",
   "block.testmod.block_test": "テストB",
   "block.testmod.magic_table": "マジックテーブル",
   "block.testmod.test_pedestal": "台座",
 
   "key.category.testmod.general": "TestMod",
-  "key.testmod.open_tablet": "魔術盤を開く"
+  "key.testmod.open_board": "魔術盤を開く",
+  "key.testmod.change_slot": "スロットを変える"
 }

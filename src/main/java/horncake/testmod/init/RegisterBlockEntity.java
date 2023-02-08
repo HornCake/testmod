@@ -1,6 +1,7 @@
 package horncake.testmod.init;
 
 import horncake.testmod.TestMod;
+import horncake.testmod.block.tile.TileBoardWorkbench;
 import horncake.testmod.block.tile.TileMagicTable;
 import horncake.testmod.block.tile.TileTestPedestal;
 import net.minecraft.world.level.block.Block;
@@ -17,4 +18,6 @@ public class RegisterBlockEntity {
             () -> BlockEntityType.Builder.of(TileTestPedestal::new, RegisterBlock.TEST_PEDESTAL.get()).build(null));
     public static final RegistryObject<BlockEntityType<TileMagicTable>> TILE_MAGIC_TABLE = BLOCK_ENTITIES.register("tile_magic_table",
             () -> BlockEntityType.Builder.of(TileMagicTable::new, RegisterBlock.MAGIC_TABLE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<TileBoardWorkbench>> TILE_BOARD_WORKBENCH = BLOCK_ENTITIES.register("tile_board_workbench",
+            () -> BlockEntityType.Builder.of(TileBoardWorkbench::new, RegisterBlock.BOARD_WORKBENCH.get()).build(null));
 }

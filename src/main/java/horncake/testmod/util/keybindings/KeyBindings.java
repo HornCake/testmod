@@ -12,10 +12,13 @@ import org.lwjgl.glfw.GLFW;
 public class KeyBindings {
     private static final String CATEGORY = "key.category.testmod.general";
 
-    public static final KeyMapping OPEN_TABLET = new KeyMapping("key.testmod.open_tablet", GLFW.GLFW_KEY_R, CATEGORY);
+    public static final KeyMapping OPEN_TABLET = new KeyMapping("key.testmod.open_board", GLFW.GLFW_KEY_G, CATEGORY);
+    public static final KeyMapping CHANGE_SLOT = new KeyMapping("key.testmod.change_slot", GLFW.GLFW_KEY_R, CATEGORY);
+
 
     @SubscribeEvent
     public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
         event.register(KeyBindings.OPEN_TABLET);
+        event.register(KeyBindings.CHANGE_SLOT);
     }
 }

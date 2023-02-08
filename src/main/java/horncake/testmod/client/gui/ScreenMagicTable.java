@@ -7,6 +7,8 @@ import horncake.testmod.client.gui.widget.DataEditBoxes;
 import horncake.testmod.init.RegisterMessage;
 import horncake.testmod.network.PacketMagicTableCreateResult;
 import horncake.testmod.network.PacketMagicTableSetText;
+import horncake.testmod.util.keybindings.KeyBindings;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -18,12 +20,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import org.jline.utils.Log;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
 public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
     private static final List<String> KEYS = List.of("Type","Count","Range");
-    private static final DataEditBoxes BOXES = new DataEditBoxes(3,KEYS);
+    private static final int BOX_SIZE = KEYS.size();
+    private static final DataEditBoxes BOXES = new DataEditBoxes(BOX_SIZE,KEYS);
     /*
     private EditBox typeText;
     private EditBox countText;
@@ -38,7 +42,6 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
 
     public ScreenMagicTable(MenuMagicTable pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
-
     }
 
     @Override
@@ -58,7 +61,7 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
             if(BOXES.getBox(key).isFocused()) {
                 BOXES.render(key, pPoseStack, pMouseX, pMouseY, pPartialTick);
             } else {
-                drawString(pPoseStack, this.font, BOXES.getValue(key), initX + BOX_X_OFFSET, initY + BOX_Y_OFFSET + BOX_GAP * i, -1);
+                drawString(pPoseStack, this.font, BOXES.getValue(key), initX + BOX_X_OFFSET, initY + BOX_Y_OFFSET + BOX_GAP * i, 1);
             }
         }
         this.renderTooltip(pPoseStack, pMouseX, pMouseY);
@@ -69,7 +72,6 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
 
          */
         this.createButton.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
-
     }
 
     @Override
@@ -88,7 +90,6 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
         } else if(this.menu.slots.get(0).hasItem() && !isInitialized) {
             this.initText();
         }
-        //Log.info(BOXES.getBox("Type").isActive()+ "\n" + BOXES.getBox("Count").isActive() +"\n"+ BOXES.getBox("Range").isActive());
     }
 
     @Override
@@ -102,9 +103,24 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
                 @Override
                 public void onRelease(double pMouseX, double pMouseY) {
                     Log.info("hi");
-                    resetFocus();
+                    BOXES.resetFocus();
                     setFocus(true);
                     super.onRelease(pMouseX, pMouseY);
+                }
+
+                @Override
+                public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
+                    String key = BOXES.getFocus();
+                    if(key == null) return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+                    int i = BOXES.getIndex(key);
+                    double x = Minecraft.getInstance().mouseHandler.xpos();
+                    double y = Minecraft.getInstance().mouseHandler.ypos();
+                    if(pKeyCode == GLFW.GLFW_KEY_UP) {
+                        BOXES.setFocus(KEYS.get(Math.floorMod(i - 1, BOX_SIZE)));
+                    } else if (pKeyCode == GLFW.GLFW_KEY_DOWN) {
+                        BOXES.setFocus(KEYS.get(Math.floorMod(i + 1, BOX_SIZE)));
+                    }
+                    return super.keyPressed(pKeyCode, pScanCode, pModifiers);
                 }
             });
         }
@@ -127,18 +143,19 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
         }));
     }
 
+
+
     private void initSimpleEditBox(EditBox text) {
         text.setCanLoseFocus(true);
         text.setTextColor(-1);
         text.setBordered(false);
         text.setValue("");
         text.setEditable(true);
+
         this.addWidget(text);
     }
 
-    private void resetFocus() {
-        KEYS.forEach(key -> BOXES.getBox(key).setFocus(false));
-    }
+
 
 
     @Override

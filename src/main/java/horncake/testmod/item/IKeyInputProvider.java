@@ -7,5 +7,5 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public interface IKeyInputProvider {
     @OnlyIn(Dist.CLIENT)
-    void onKeyPressed(Player player, ItemStack stack);
+    void onKeyPressed(Player player, ItemStack stack, int key);
 }

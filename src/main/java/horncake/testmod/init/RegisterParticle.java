@@ -18,12 +18,12 @@ import net.minecraftforge.registries.RegistryObject;
 public class RegisterParticle {
     public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, TestMod.MODID);
 
-    public static final RegistryObject<ParticleType<ParticleTestOptions>> TEST_PARTICLE = PARTICLES.register("test_particle",() -> new ParticleTestType());
+    public static final RegistryObject<ParticleType<ParticleTestOptions>> TEST_PARTICLE = PARTICLES.register("test_particle",ParticleTest.Type::new);
     public static final RegistryObject<SimpleParticleType> PLANE_TEST_PARTICLE = PARTICLES.register("plane_test_particle",() -> new SimpleParticleType(true));
 
     @SubscribeEvent
     public static void registerParticle(RegisterParticleProvidersEvent event) {
-        Minecraft.getInstance().particleEngine.register(TEST_PARTICLE.get(), ParticleTestFactory::new);
+        Minecraft.getInstance().particleEngine.register(TEST_PARTICLE.get(), ParticleTest.Provider::new);
         Minecraft.getInstance().particleEngine.register(PLANE_TEST_PARTICLE.get(), ParticlePlaneTest.Provider::new);
 
     }

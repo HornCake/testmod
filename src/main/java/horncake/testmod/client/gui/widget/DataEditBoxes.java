@@ -7,6 +7,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import org.jline.utils.Log;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.*;
@@ -34,7 +35,7 @@ public class DataEditBoxes {
         }
     }
 
-    private int getIndex(String key) {
+    public int getIndex(String key) {
         return this.boxMap.get(key);
     }
 
@@ -80,11 +81,23 @@ public class DataEditBoxes {
         return this.boxList.get(getIndex(key));
     }
 
-    public void renderAll(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
-        for(String s : keyList) {
-            this.getBox(s).render(pPoseStack, pMouseX, pMouseY, pPartialTick);
-        }
+    public void resetFocus() {
+        keyList.forEach(key -> this.getBox(key).setFocus(false));
     }
+
+    public void setFocus(String key) {
+        this.resetFocus();
+        this.getBox(key).setFocus(true);
+        this.getBox(key).active = true;
+    }
+
+    public String getFocus() {
+        for (String s : keyList) {
+            if(getBox(s).isFocused()) return s;
+        }
+        return null;
+    }
+
     public void render(String key, PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
         this.getBox(key).render(pPoseStack, pMouseX, pMouseY, pPartialTick);
     }

@@ -2,11 +2,12 @@
   "item.testmod.item_test": "TestI",
   "item.testmod.item_test2": "TestI2",
   "item.testmod.item_test3": "TestI3",
-  "item.testmod.tablet": "Tablet",
+  "item.testmod.caster_board": "CasterBoard",
   "block.testmod.block_test": "TestB",
   "block.testmod.magic_table": "MagicTable",
   "block.testmod.test_pedestal": "TestPedestal",
 
   "key.category.testmod.general": "TestMod",
-  "key.testmod.open_tablet": "Open Tablet"
+  "key.testmod.open_board": "Open Caster Board",
+  "key.testmod.change_slot": "Change Slot"
 }
