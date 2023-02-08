@@ -7,6 +7,7 @@ import com.mojang.math.Vector3f;
 import horncake.testmod.TestMod;
 import horncake.testmod.init.RegisterMessage;
 import horncake.testmod.network.PacketSetBoardSlot;
+import horncake.testmod.util.Animation;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
@@ -17,41 +18,54 @@ import org.jline.utils.Log;
 
 public class ScreenRadialMenu extends Screen {
     private final ItemStack itemStack;
-    private int radialFrame;
-    private static final int RADIAL_ANIMATION_LENGTH = 10;
     private static final int TEXTURE_SIZE = 100;
     private int previousSlot;
-    private double sectorSize;
-    private int sectorFrame;
-    private static final int SECTOR_ANIMATION_LENGTH = 10;
+
+
+    private final Animation<Integer> radialAnimation = new Animation<>(10,0) {
+        @Override
+        public Integer process(int length, int frame, Integer object) {
+            return (int) (this.getFactor() * TEXTURE_SIZE);
+        }
+    };
+    private final Animation<Double> sectorAnimation = new Animation<>(10, 4.0) {
+        @Override
+        public Double process(int length, int frame, Double object) {
+            double factor = this.getFactor();
+            return -120 * Math.pow(factor,2) + 160 * factor + 40;
+        }
+    };
+
 
     public ScreenRadialMenu(ItemStack itemStack) {
         super(Component.literal(""));
         this.itemStack = itemStack;
-        this.radialFrame = 0;
+        radialAnimation.start();
+        sectorAnimation.start();
     }
 
     @Override
     public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
-        if(radialFrame < RADIAL_ANIMATION_LENGTH) {
-            radialFrame += 1;
-        }
+        radialAnimation.tick();
+        sectorAnimation.tick();
+
+        int centerX = width / 2;
+        int centerY = height / 2;
+
         ResourceLocation resourceLocation = new ResourceLocation(TestMod.MODID,"textures/gui/board.png");
         RenderSystem.setShaderTexture(0, resourceLocation);
 
-        double factor = (double) radialFrame / RADIAL_ANIMATION_LENGTH;
-        int size = (int)(factor * TEXTURE_SIZE);
-        int centerX = width / 2;
-        int centerY = height / 2;
+        int size = radialAnimation.get();
+
 
         pPoseStack.pushPose();
         //BakedModel bakedmodel = this.itemRenderer.getItemModelShaper().getItemModel(itemStack);
 
-        Quaternion quaternion = new Quaternion(new Vector3f(0,0,1),180 * (float)factor + 180, true);
+        Quaternion quaternion = new Quaternion(new Vector3f(0,0,1),180 * (float) radialAnimation.getFactor() + 180, true);
         pPoseStack.translate(((double)width) / 2,((double)height) / 2,0);//原点移動
         pPoseStack.mulPose(quaternion);
-        pPoseStack.translate(-size/2,-size/2,0);//回転後図形を移動
+        pPoseStack.translate(-(double) size/2,-(double) size/2,0);//回転後図形を移動
         blit(pPoseStack, 0, 0,0,0,size, size, size, size);
 
         RenderSystem.enableBlend();
@@ -67,19 +81,12 @@ public class ScreenRadialMenu extends Screen {
         //時計回りじゃないと裏面(透明)が表示される!!!
         float argument = getArg((float) (pMouseX - centerX), (float) -(pMouseY - centerY));
         int slot = Math.floorMod(Math.round((argument / Math.PI) * 4),8);
-        double theta =  (-2 * Math.PI *  slot / 8) + Math.PI / 8;
-
         if(previousSlot != slot) {
+            sectorAnimation.start();
             previousSlot = slot;
-            sectorSize = 40;
-            sectorFrame = 0;
-        }else {
-            if(sectorFrame < SECTOR_ANIMATION_LENGTH) {
-                sectorFrame += 1;
-            }
-            double factor2 = (double) sectorFrame / SECTOR_ANIMATION_LENGTH;
-            sectorSize = -120 * Math.pow(factor2,2) + 160 * factor2 + 40;
         }
+        double theta =  (-2 * Math.PI *  slot / 8) + Math.PI / 8;
+        double sectorSize = sectorAnimation.get();
 
         buffer.vertex(centerX,centerY,10).color(255,255,255,100).endVertex();
         for(int i = 0 ; i <= 10; i++) {
