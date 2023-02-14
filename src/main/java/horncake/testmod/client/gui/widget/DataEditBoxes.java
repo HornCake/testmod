@@ -1,110 +1,47 @@
 package horncake.testmod.client.gui.widget;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import horncake.testmod.client.gui.ScreenMagicTable;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.EditBox;
+import horncake.testmod.init.RegisterMessage;
+import horncake.testmod.network.PacketMagicTableSetText;
+import horncake.testmod.util.MediumData;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import org.jline.utils.Log;
-import org.lwjgl.glfw.GLFW;
 
-import java.awt.*;
-import java.util.*;
 import java.util.List;
 
-public class DataEditBoxes {
-    private List<EditBox> boxList;
-    private Map<String, Integer> boxMap;
-    private List<String> keyList;
-
-    private int size;
-
-    public DataEditBoxes(int size, String ... key){
-        this(size, Arrays.stream(key).toList());
-    }
-
+public class DataEditBoxes extends MultipleEditBoxes{
+    private static final int SIZE = MediumData.NAME_LIST2.size();
     public DataEditBoxes(int size, List<String> key) {
-        this.size = size;
-        this.keyList = key;
-        this.boxList = new ArrayList<>();
-        this.boxMap = new HashMap<>(size);
-        for(int i = 0; i < size; i++) {
-            this.boxMap.put(key.get(i),i);
-            this.boxList.add(i,new EditBox(Minecraft.getInstance().font, 0,0,0,0, Component.empty()));
-        }
+        super(size, key);
     }
-
-    public int getIndex(String key) {
-        return this.boxMap.get(key);
-    }
-
-
-    public void setEditBox(String key, EditBox box) {
-        this.boxList.set(getIndex(key),box);
-    }
-
-
-    public void setValueFromTag(String key, CompoundTag tag) {
-        this.getBox(key).setValue(String.valueOf(tag.getInt(key)));
-    }
-
-    public void setValue(String key, String text) {
-        this.getBox(key).setValue(text);
-    }
-
-    public void setAllValue(String text) {
-        for(String s : keyList) {
-            setValue(s,text);
-        }
-    }
-
-    public String getValue(String key) {
-        return this.getBox(key).getValue();
-    }
-
-    public List<String> getAllValue() {
-        return new ArrayList<>() {
-            {
-                for (String s : keyList) {
-                    getValue(s);
+    public DataEditBoxes(List<String> key) {
+        super(SIZE,key);/*
+        key.forEach(key1 -> {
+            this.getBox(key1).setResponder(s -> {
+                if(s != null) {
+                    RegisterMessage.sendToServer(new PacketMagicTableSetText(s, key1));
                 }
-            }
-        };
+            });
+        });
+        */
     }
 
-    public List<EditBox> getBoxList() {
-        return this.boxList;
+    public void setResponders() {
+        List<String> keys = getKeyList();
+        keys.forEach(key -> {
+            this.getBox(key).setResponder(s -> {
+                if(s != null) {
+                    RegisterMessage.sendToServer(new PacketMagicTableSetText(s, key));
+                }
+            });
+        });
     }
 
-    public EditBox getBox(String key) {
-        return this.boxList.get(getIndex(key));
-    }
-
-    public void resetFocus() {
-        keyList.forEach(key -> this.getBox(key).setFocus(false));
-    }
-
-    public void setFocus(String key) {
-        this.resetFocus();
-        this.getBox(key).setFocus(true);
-        this.getBox(key).active = true;
-    }
-
-    public String getFocus() {
-        for (String s : keyList) {
-            if(getBox(s).isFocused()) return s;
-        }
-        return null;
-    }
-
-    public void render(String key, PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
-        this.getBox(key).render(pPoseStack, pMouseX, pMouseY, pPartialTick);
-    }
-
-    public void tick() {
-        for(String s : keyList) {
-            this.getBox(s).tick();
+    @Override
+    public void setValueFromTag(String key, CompoundTag tag) {
+        if(key.matches(MediumData.R) || key.matches(MediumData.G) || key.matches(MediumData.B)){
+            CompoundTag tag2 = tag.getCompound(MediumData.COLOR);
+            super.setValueFromTag(key,tag2);
+        } else {
+            super.setValueFromTag(key, tag);
         }
     }
 }

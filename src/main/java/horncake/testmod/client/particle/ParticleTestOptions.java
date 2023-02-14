@@ -5,6 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import horncake.testmod.init.RegisterParticle;
+import horncake.testmod.util.ColorHandler;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -27,6 +28,9 @@ public class ParticleTestOptions implements ParticleOptions {
         this.size = size;
         this.age = age;
         this.alpha = alpha;
+    }
+    public ParticleTestOptions(ColorHandler color, float size, int age, float alpha) {
+        this(color.getRFloat(), color.getGFloat(), color.getBFloat(), size, age, alpha);
     }
     public static final Codec<ParticleTestOptions> CODEC = RecordCodecBuilder.create(i ->
             i.group(

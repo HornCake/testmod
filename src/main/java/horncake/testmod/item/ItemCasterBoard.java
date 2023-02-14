@@ -31,10 +31,10 @@ public class ItemCasterBoard extends Item implements IKeyInputProvider, MenuProv
     public void onKeyPressed(Player player, ItemStack stack, int key) {
         if(player.containerMenu instanceof MenuCasterBoard) return;
         if(key == KeyBindings.OPEN_TABLET.getKey().getValue()) {
-            RegisterMessage.sendToServer(new PacketOpenBoardMenu(CasterUtil.getCaster(player).getTag()));
+            RegisterMessage.sendToServer(new PacketOpenBoardMenu(CasterUtil.getCaster(player)));
         } else if(key == KeyBindings.CHANGE_SLOT.getKey().getValue()) {
             if(!(Minecraft.getInstance().screen instanceof ScreenRadialMenu)){
-                Minecraft.getInstance().setScreen(new ScreenRadialMenu(new ItemStack(this)));
+                Minecraft.getInstance().setScreen(new ScreenRadialMenu(CasterUtil.getCaster(player)));
             } else {
                 player.closeContainer();
             }

@@ -1,9 +1,6 @@
 package horncake.testmod.util;
 
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-
-public class Animation<T> {
+public class AnimationHelper<T> {
     private final int length;
     private final T initObject;
     private final AnimationFunction<Integer, Integer, T, T> animation;
@@ -14,15 +11,15 @@ public class Animation<T> {
     private boolean isLoop;
     private T object;
 
-    public Animation(int length, T object) {
+    public AnimationHelper(int length, T object) {
         this(length,object, false, null);
     }
 
-    public Animation(int length, T object, AnimationFunction<Integer, Integer, T, T> animation) {
+    public AnimationHelper(int length, T object, AnimationFunction<Integer, Integer, T, T> animation) {
         this(length, object, false, animation);
     }
 
-    public Animation(int length, T initObject, boolean isLoop,  AnimationFunction<Integer, Integer, T, T> animation) {
+    public AnimationHelper(int length, T initObject, boolean isLoop, AnimationFunction<Integer, Integer, T, T> animation) {
         this.length = length;
         this.object = initObject;
         this.initObject = initObject;

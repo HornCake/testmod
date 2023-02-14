@@ -3,6 +3,10 @@ package horncake.testmod.client.gui;
 import horncake.testmod.block.tile.TileMagicTable;
 import horncake.testmod.init.RegisterBlock;
 import horncake.testmod.init.RegisterMenuType;
+import horncake.testmod.util.ColorHandler;
+import horncake.testmod.util.CommonUtil;
+import horncake.testmod.util.MediumData;
+import horncake.testmod.util.ProjectileType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
@@ -16,11 +20,12 @@ import org.jline.utils.Log;
 
 
 public class MenuMagicTable extends AbstractContainerMenu {
-
     private final ContainerLevelAccess access;
     private String typeData;
     private String countData;
     private String rangeData;
+
+    private MediumData mediumData;
 
     private Container container;
 
@@ -56,6 +61,14 @@ public class MenuMagicTable extends AbstractContainerMenu {
             public ItemStack remove(int pAmount) {
                 isRemoved = true;
                 return super.remove(pAmount);
+            }
+
+            @Override
+            public boolean mayPlace(ItemStack pStack) {
+                if(pStack.getTag() != null) {
+                    setMediumData(new MediumData(pStack.getTag()));
+                }
+                return super.mayPlace(pStack);
             }
         });
 
@@ -120,10 +133,36 @@ public class MenuMagicTable extends AbstractContainerMenu {
     }
 
 
+    /*
     public void setData(String type, String count, String range) {
         this.typeData = type;
         this.countData = count;
         this.rangeData = range;
+    }
+     */
+
+    //TODO くそコード要改善
+    public void setMediumData(String value, String dataType) {
+        boolean isInt = CommonUtil.isInt(value);
+        boolean isFloat = CommonUtil.isFloat(value);
+        if(!isInt && !isFloat) return;
+        switch (dataType) {
+            case MediumData.TYPE -> this.mediumData.setType(isInt ? ProjectileType.getType(Integer.parseInt(value)) : this.mediumData.getType());
+            case MediumData.COUNT -> this.mediumData.setCount(isInt ? Integer.parseInt(value) : this.mediumData.getCount());
+            case MediumData.RANGE -> this.mediumData.setRange(isInt ? Integer.parseInt(value) : this.mediumData.getRange());
+            case MediumData.VELOCITY -> this.mediumData.setVelocity(isFloat ? Float.parseFloat(value) : this.mediumData.getVelocity());
+            case MediumData.R -> this.mediumData.setR(isInt ? Integer.parseInt(value) : this.mediumData.getColor().getRInt());
+            case MediumData.G -> this.mediumData.setG(isInt ? Integer.parseInt(value) : this.mediumData.getColor().getGInt());
+            case MediumData.B -> this.mediumData.setB(isInt ? Integer.parseInt(value) : this.mediumData.getColor().getBInt());
+        }
+    }
+
+    public void setMediumData(MediumData mediumData) {
+        this.mediumData = mediumData;
+    }
+
+    public MediumData getMediumData() {
+        return this.mediumData;
     }
 
     private boolean isInt(String string) {
@@ -139,6 +178,11 @@ public class MenuMagicTable extends AbstractContainerMenu {
         Log.info("2");
         Log.info(this.countData);
         ItemStack stack = this.inputSlot.getItem(0);
+        if(!stack.isEmpty() && mediumData != null) {
+            stack.setTag(this.mediumData.createNBT(stack.getOrCreateTag()));
+            this.resultSlot.setItem(0,inputSlot.getItem(0));
+        }
+        /*
         if(countData == null) { return; }
         if(!stack.isEmpty() && isInt(typeData) && isInt(countData) && isInt(rangeData)) {
             CompoundTag nbt = stack.getOrCreateTag();
@@ -150,6 +194,7 @@ public class MenuMagicTable extends AbstractContainerMenu {
             stack.setTag(nbt);
             this.resultSlot.setItem(0,inputSlot.getItem(0));
         }
+         */
         this.broadcastChanges();
     }
 

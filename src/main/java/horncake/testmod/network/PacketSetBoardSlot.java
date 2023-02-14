@@ -1,5 +1,6 @@
 package horncake.testmod.network;
 
+import horncake.testmod.util.CasterUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,7 +34,7 @@ public class PacketSetBoardSlot extends PacketBase {
 
             ServerPlayer player = context.getSender();
             if (player == null) return;
-            ItemStack itemStack = player.getMainHandItem();
+            ItemStack itemStack = CasterUtil.getCaster(player);
             CompoundTag tag = itemStack.getOrCreateTag();
             tag.putInt("SelectedSlot",slot);
             itemStack.setTag(tag);

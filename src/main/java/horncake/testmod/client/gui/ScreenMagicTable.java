@@ -4,10 +4,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import horncake.testmod.TestMod;
 import horncake.testmod.client.gui.widget.DataEditBoxes;
+import horncake.testmod.client.gui.widget.MultipleEditBoxes;
 import horncake.testmod.init.RegisterMessage;
 import horncake.testmod.network.PacketMagicTableCreateResult;
 import horncake.testmod.network.PacketMagicTableSetText;
-import horncake.testmod.util.keybindings.KeyBindings;
+import horncake.testmod.util.MediumData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -25,9 +26,9 @@ import org.lwjgl.glfw.GLFW;
 import java.util.List;
 
 public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
-    private static final List<String> KEYS = List.of("Type","Count","Range");
+    private static final List<String> KEYS = MediumData.NAME_LIST2;
     private static final int BOX_SIZE = KEYS.size();
-    private static final DataEditBoxes BOXES = new DataEditBoxes(BOX_SIZE,KEYS);
+    private static final DataEditBoxes BOXES = new DataEditBoxes(KEYS);
     /*
     private EditBox typeText;
     private EditBox countText;
@@ -37,8 +38,8 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
     private boolean isInitialized;
 
     private final int BOX_X_OFFSET = 62;
-    private final int BOX_Y_OFFSET = 24;
-    private final int BOX_GAP = 12;
+    private final int BOX_Y_OFFSET = 14;
+    private final int BOX_GAP = 8;
 
     public ScreenMagicTable(MenuMagicTable pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
@@ -107,10 +108,10 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
                     setFocus(true);
                     super.onRelease(pMouseX, pMouseY);
                 }
-
                 @Override
                 public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
                     String key = BOXES.getFocus();
+                    Log.info("HAI");
                     if(key == null) return super.keyPressed(pKeyCode, pScanCode, pModifiers);
                     int i = BOXES.getIndex(key);
                     double x = Minecraft.getInstance().mouseHandler.xpos();
@@ -129,10 +130,12 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
         this.countText = new EditBox(this.font, w + 62, h + 36, 50, 12, Component.literal("Count"));
         this.rangeText = new EditBox(this.font, w + 62, h + 48, 50, 12, Component.literal("Count"));
          */
+        /*
         BOXES.getBox("Type").setResponder(this::onTypeChanged);
         BOXES.getBox("Count").setResponder(this::onCountChanged);
         BOXES.getBox("Range").setResponder(this::onRangeChanged);
-
+         */
+        BOXES.setResponders();
         KEYS.forEach(key -> initSimpleEditBox(BOXES.getBox(key)));
 
 
@@ -143,8 +146,6 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
         }));
     }
 
-
-
     private void initSimpleEditBox(EditBox text) {
         text.setCanLoseFocus(true);
         text.setTextColor(-1);
@@ -154,9 +155,6 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
 
         this.addWidget(text);
     }
-
-
-
 
     @Override
     protected void renderBg(PoseStack pPoseStack, float pPartialTick, int pMouseX, int pMouseY) {
@@ -188,6 +186,7 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
         this.isInitialized = false;
     }
 
+    /*
     //さすがに糞コード
     private void onTypeChanged(String string) {
         if (!string.isEmpty()) {
@@ -209,5 +208,7 @@ public class ScreenMagicTable extends AbstractContainerScreen<MenuMagicTable> {
             RegisterMessage.sendToServer(new PacketMagicTableSetText(BOXES.getBox("Type").getValue(), BOXES.getBox("Count").getValue(), string));
         }
     }
+
+     */
 
 }

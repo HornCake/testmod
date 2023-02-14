@@ -6,6 +6,7 @@ import horncake.testmod.entity.ProjectileStraight;
 import horncake.testmod.entity.ProjectileTest;
 import horncake.testmod.init.RegisterParticle;
 import horncake.testmod.util.CasterUtil;
+import horncake.testmod.util.MediumData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -53,6 +54,11 @@ public class ItemTest3 extends Item {
             pTooltipComponents.add(Component.literal("Type : " + pStack.getTag().getInt("Type")));
             pTooltipComponents.add(Component.literal("Count : " + pStack.getTag().getInt("Count")));
             pTooltipComponents.add(Component.literal("Range : " + pStack.getTag().getInt("Range")));
+            pTooltipComponents.add(Component.literal("Velocity : " + pStack.getTag().getInt("Velocity")));
+            pTooltipComponents.add(Component.literal("Color : "
+                    + pStack.getTag().getCompound("Color").getInt("R") + ","
+                    + pStack.getTag().getCompound("Color").getInt("G") + ","
+                    + pStack.getTag().getCompound("Color").getInt("B")));
         }
     }
 

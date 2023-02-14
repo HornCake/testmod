@@ -4,6 +4,7 @@ import horncake.testmod.TestMod;
 import horncake.testmod.client.gui.ScreenRadialMenu;
 import horncake.testmod.item.IKeyInputProvider;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -21,6 +22,7 @@ public class KeyHandler {
         Player player = MINECRAFT.player;
         ItemStack itemStack = player.getMainHandItem();
         ItemStack itemStack2 = player.getOffhandItem();
+        //if((itemStack.isEmpty() && itemStack2.isEmpty()) || (!(itemStack.getItem() instanceof IKeyInputProvider) && !(itemStack2.getItem() instanceof IKeyInputProvider))) player.sendSystemMessage(Component.literal("HI"));
         if (key == OPEN_TABLET.getKey().getValue() || key == CHANGE_SLOT.getKey().getValue()) {
             if(itemStack != null && itemStack.getItem() instanceof IKeyInputProvider provider) {
                 provider.onKeyPressed(player,itemStack,key);

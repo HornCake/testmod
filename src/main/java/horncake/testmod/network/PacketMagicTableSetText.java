@@ -1,6 +1,7 @@
 package horncake.testmod.network;
 
 import horncake.testmod.client.gui.MenuMagicTable;
+import horncake.testmod.util.MediumData;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
@@ -12,10 +13,12 @@ public class PacketMagicTableSetText extends PacketBase{
     private static String count;
     private static String range;
 
-    public PacketMagicTableSetText(String type, String count, String range) {
-        this.type = type;
-        this.count = count;
-        this.range = range;
+    private static String value;
+    private static String dataType;
+
+    public PacketMagicTableSetText(String value, String dataType) {
+        PacketMagicTableSetText.value = value;
+        PacketMagicTableSetText.dataType = dataType;
     }
 
     public PacketMagicTableSetText(FriendlyByteBuf buf) {}
@@ -34,7 +37,7 @@ public class PacketMagicTableSetText extends PacketBase{
             if (player == null) return;
 
             if(player.containerMenu instanceof MenuMagicTable menu) {
-                menu.setData(type,count,range);
+                menu.setMediumData(value, dataType);
 
             }
         });

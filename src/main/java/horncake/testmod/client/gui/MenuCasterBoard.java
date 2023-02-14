@@ -9,6 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -21,7 +22,7 @@ import org.jline.utils.Log;
 
 public class MenuCasterBoard extends AbstractContainerMenu {
     private static final int CONTAINER_SIZE = 8;
-    public int selectedSlot;
+    public final int selectedSlot;
 
     public final Container container = new SimpleContainer(CONTAINER_SIZE) {
         public void setChanged() {
@@ -33,26 +34,29 @@ public class MenuCasterBoard extends AbstractContainerMenu {
     private final Container copiedContainer;
 
     public MenuCasterBoard(int pContainerId, Inventory inventory) {
-        this(pContainerId, inventory, new CompoundTag());
-        Log.info("AA");
+        this(pContainerId, inventory, ItemStack.EMPTY, -1);
     }
 
     public MenuCasterBoard(int pContainerId, Inventory inventory, FriendlyByteBuf buf) {
-        this(pContainerId, inventory, buf.readNbt());
-        Log.info("BB");
+        this(pContainerId, inventory, buf.readItem(), buf.readInt());
     }
 
 
-    public MenuCasterBoard(int pContainerId, Inventory inventory, CompoundTag tag) {
+    public MenuCasterBoard(int pContainerId, Inventory inventory, ItemStack stack, int slot) {
         super(RegisterMenuType.MENU_CASTER_BOARD.get(), pContainerId);
         Log.info("CC");
-        Log.info(tag.contains("Items"));
-        if(tag.contains("Items")) {
-            InventoryTag.createContainer(this.container, tag.getList("Items", Tag.TAG_COMPOUND));
+        if(stack.getTag() != null) {
+            CompoundTag tag = stack.getTag();
+            Log.info(tag.contains("Items"));
+
+            if(tag.contains("Items")) {
+                InventoryTag.createContainer(this.container, tag.getList("Items", Tag.TAG_COMPOUND));
+            }
         }
-        Log.info(ItemStack.of(tag.getList("Items",Tag.TAG_COMPOUND).getCompound(0)));
+
 
         this.copiedContainer = container;
+        this.selectedSlot = slot;
 
         for (int i = 0; i < CONTAINER_SIZE; i++) {
             this.addSlot(new Slot(this.container, i, 8 + i * 18, 64) {
@@ -70,10 +74,9 @@ public class MenuCasterBoard extends AbstractContainerMenu {
             }
         }
         for(int k = 0; k < 9; ++k) {
-            if(!(inventory.getItem(k).getItem() instanceof ItemCasterBoard)) {
+            if(selectedSlot == -1 || selectedSlot != k) {
                 this.addSlot(new Slot(inventory, k, 8 + k * 18, 142));
             } else {
-                selectedSlot = k;
                 this.addSlot(new Slot(inventory, k, 8 + k * 18, 142) {
                     @Override
                     public boolean mayPickup(Player pPlayer) {
@@ -112,20 +115,24 @@ public class MenuCasterBoard extends AbstractContainerMenu {
     @Override
     public void removed(Player pPlayer) {
         super.removed(pPlayer);
+        if(selectedSlot == -1) return;
         Level level = pPlayer.getLevel();
-        ItemStack itemStack = CasterUtil.getCaster(pPlayer);
-        if(itemStack.getItem() instanceof ItemCasterBoard) {
-            CompoundTag tag = itemStack.getOrCreateTag();
-            tag.put("Items", InventoryTag.createNBT(container));
-            itemStack.setTag(tag);
-        } else {
+        ItemStack itemStack = pPlayer.getInventory().getItem(selectedSlot);
 
+        CompoundTag tag = itemStack.getOrCreateTag();
+        tag.put("Items", InventoryTag.createNBT(container));
+        itemStack.setTag(tag);
+
+        /*
+        if(itemStack.getItem() instanceof ItemCasterBoard) {
+        } else {
             for(int i = 0; i < CONTAINER_SIZE; i++) {
                 if(!container.getItem(i).isEmpty() && !level.isClientSide) {
                     level.addFreshEntity(new ItemEntity(level, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), container.getItem(i)));
                 }
             }
         }
+         */
     }
 
 

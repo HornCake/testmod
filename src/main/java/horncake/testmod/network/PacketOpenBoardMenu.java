@@ -7,6 +7,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkHooks;
 
@@ -16,10 +17,10 @@ import java.util.function.Supplier;
 
 public class PacketOpenBoardMenu extends PacketBase {
 
-    private CompoundTag tag;
+    private static ItemStack stack;
 
-    public PacketOpenBoardMenu(CompoundTag tag) {
-        this.tag = tag;
+    public PacketOpenBoardMenu(ItemStack stack) {
+        this.stack = stack;
     }
 
     public PacketOpenBoardMenu(FriendlyByteBuf buf) {
@@ -37,9 +38,10 @@ public class PacketOpenBoardMenu extends PacketBase {
             ServerPlayer sPlayer = context.getSender();
             if (sPlayer == null) return;
             NetworkHooks.openScreen(sPlayer, new SimpleMenuProvider((id, inventory, player) ->
-                            new MenuCasterBoard(id, inventory, CasterUtil.getCaster(player).getTag()),Component.literal("a")),
+                            new MenuCasterBoard(id, inventory, stack, CasterUtil.getCasterSlot(player)),Component.literal("a")),
                     buf -> {
-                        buf.writeNbt(CasterUtil.getCaster(sPlayer).getTag());
+                        buf.writeItemStack(stack,false);
+                        buf.writeInt(CasterUtil.getCasterSlot(sPlayer));
                     });
 
         });
